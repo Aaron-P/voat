@@ -683,9 +683,15 @@ namespace Voat.Controllers
             try
             {
                 // fetch a random subverse with minimum number of subscribers where last subverse activity was evident
-                var subverse = from subverses in _db.Subverses
-                          .Where(s => s.subscribers > 10 && !s.name.Equals("all", StringComparison.OrdinalIgnoreCase) && s.last_submission_received != null)
-                               select subverses;
+                var subverse = _db.Subverses
+                    .Where(s => s.subscribers > 10
+                        && !s.name.Equals("all", StringComparison.OrdinalIgnoreCase)
+                        && s.last_submission_received != null
+                        && s.admin_disabled != true
+                        //&& s.rated_adult == false //TODO: User setting for adult subverses?
+                        //&& s.UserBlockedSubverses //TODO: Don't take them randomly to a blocked subverse?
+                        && s.forced_private == false
+                        && s.private_subverse == false);
 
                 var submissionCount = 0;
                 Subverse randomSubverse;
